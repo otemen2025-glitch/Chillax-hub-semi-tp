@@ -1,0 +1,302 @@
+-- LocalScript (put in StarterGui)
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "ChillaxSemiTP"
+screenGui.ResetOnSpawn = false
+screenGui.IgnoreGuiInset = true
+screenGui.Parent = playerGui
+
+-- ==================== FULL SCREEN INTRO ====================
+local intro = Instance.new("Frame")
+intro.Size = UDim2.new(1, 0, 1, 0)
+intro.Position = UDim2.new(0, 0, 0, 0)
+intro.BackgroundColor3 = Color3.fromRGB(8, 10, 18)
+intro.BorderSizePixel = 0
+intro.ZIndex = 100
+intro.Parent = screenGui
+
+local introTitle = Instance.new("TextLabel")
+introTitle.Size = UDim2.new(1, 0, 0, 70)
+introTitle.Position = UDim2.new(0, 0, 0.4, 0)
+introTitle.BackgroundTransparency = 1
+introTitle.Text = "Chillax Hub"
+introTitle.TextColor3 = Color3.fromRGB(180, 220, 255)
+introTitle.TextSize = 52
+introTitle.Font = Enum.Font.GothamBold
+introTitle.ZIndex = 101
+introTitle.Parent = intro
+
+local introSub = Instance.new("TextLabel")
+introSub.Size = UDim2.new(1, 0, 0, 30)
+introSub.Position = UDim2.new(0, 0, 0.52, 0)
+introSub.BackgroundTransparency = 1
+introSub.Text = "Loading..."
+introSub.TextColor3 = Color3.fromRGB(120, 160, 220)
+introSub.TextSize = 20
+introSub.Font = Enum.Font.Gotham
+introSub.ZIndex = 101
+introSub.Parent = intro
+
+-- ==================== MAIN GUI ====================
+local main = Instance.new("Frame")
+main.Size = UDim2.new(0, 240, 0, 270)
+main.Position = UDim2.new(1, -260, 0, 20)
+main.BackgroundColor3 = Color3.fromRGB(12, 14, 24)
+main.BorderSizePixel = 0
+main.Visible = false
+main.Parent = screenGui
+Instance.new("UICorner", main).CornerRadius = UDim.new(0, 12)
+
+local stroke = Instance.new("UIStroke")
+stroke.Color = Color3.fromRGB(50, 130, 255)
+stroke.Thickness = 1.5
+stroke.Parent = main
+
+local titleBar = Instance.new("Frame")
+titleBar.Size = UDim2.new(1, 0, 0, 38)
+titleBar.BackgroundColor3 = Color3.fromRGB(18, 22, 40)
+titleBar.BorderSizePixel = 0
+titleBar.Parent = main
+Instance.new("UICorner", titleBar).CornerRadius = UDim.new(0, 12)
+
+local titleFix = Instance.new("Frame")
+titleFix.Size = UDim2.new(1, 0, 0, 14)
+titleFix.Position = UDim2.new(0, 0, 1, -14)
+titleFix.BackgroundColor3 = Color3.fromRGB(18, 22, 40)
+titleFix.BorderSizePixel = 0
+titleFix.Parent = titleBar
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, -100, 1, 0)
+title.Position = UDim2.new(0, 12, 0, 0)
+title.BackgroundTransparency = 1
+title.Text = "Chillax Semi TP"
+title.TextColor3 = Color3.fromRGB(180, 215, 255)
+title.TextSize = 15
+title.Font = Enum.Font.GothamBold
+title.TextXAlignment = Enum.TextXAlignment.Left
+title.Parent = titleBar
+
+local function makeTopBtn(text, x, color)
+	local b = Instance.new("TextButton")
+	b.Size = UDim2.new(0, 26, 0, 26)
+	b.Position = UDim2.new(1, x, 0.5, -13)
+	b.BackgroundColor3 = color
+	b.Text = text
+	b.TextColor3 = Color3.new(1,1,1)
+	b.TextSize = 14
+	b.Font = Enum.Font.GothamBold
+	b.Parent = titleBar
+	Instance.new("UICorner", b).CornerRadius = UDim.new(0, 6)
+	return b
+end
+
+local lockBtn = makeTopBtn("🔓", -90, Color3.fromRGB(30, 55, 120))
+local minBtn = makeTopBtn("–", -58, Color3.fromRGB(30, 55, 120))
+local closeBtn = makeTopBtn("×", -28, Color3.fromRGB(190, 45, 55))
+
+closeBtn.MouseButton1Click:Connect(function()
+	screenGui:Destroy()
+end)
+
+local content = Instance.new("Frame")
+content.Size = UDim2.new(1, -20, 1, -50)
+content.Position = UDim2.new(0, 10, 0, 46)
+content.BackgroundTransparency = 1
+content.Parent = main
+
+local function makeBtn(text, y)
+	local b = Instance.new("TextButton")
+	b.Size = UDim2.new(1, 0, 0, 38)
+	b.Position = UDim2.new(0, 0, 0, y)
+	b.BackgroundColor3 = Color3.fromRGB(22, 30, 58)
+	b.Text = text
+	b.TextColor3 = Color3.fromRGB(210, 230, 255)
+	b.TextSize = 14
+	b.Font = Enum.Font.GothamBold
+	b.Parent = content
+	Instance.new("UICorner", b).CornerRadius = UDim.new(0, 8)
+	return b
+end
+
+local resetBtn = makeBtn("On / Off", 0)
+local resetOn = false
+
+resetBtn.MouseButton1Click:Connect(function()
+	resetOn = not resetOn
+	if resetOn then
+		resetBtn.Text = "On"
+		resetBtn.BackgroundColor3 = Color3.fromRGB(25, 110, 55)
+		local char = player.Character
+		if char then
+			local hum = char:FindFirstChildOfClass("Humanoid")
+			if hum then hum.Health = 0 end
+		end
+	else
+		resetBtn.Text = "On / Off"
+		resetBtn.BackgroundColor3 = Color3.fromRGB(22, 30, 58)
+	end
+end)
+
+local autoBtn = makeBtn("Auto Grab Off", 48)
+local autoOn = false
+
+local stealBtn = Instance.new("TextButton")
+stealBtn.Size = UDim2.new(1, 0, 0, 44)
+stealBtn.Position = UDim2.new(0, 0, 0, 96)
+stealBtn.BackgroundColor3 = Color3.fromRGB(22, 30, 58)
+stealBtn.Text = ""
+stealBtn.Parent = content
+Instance.new("UICorner", stealBtn).CornerRadius = UDim.new(0, 8)
+
+local stealTitle = Instance.new("TextLabel")
+stealTitle.Size = UDim2.new(1, 0, 0, 24)
+stealTitle.Position = UDim2.new(0, 0, 0, 2)
+stealTitle.BackgroundTransparency = 1
+stealTitle.Text = "Steal"
+stealTitle.TextColor3 = Color3.fromRGB(210, 230, 255)
+stealTitle.TextSize = 15
+stealTitle.Font = Enum.Font.GothamBold
+stealTitle.Parent = stealBtn
+
+local stealNote = Instance.new("TextLabel")
+stealNote.Size = UDim2.new(1, 0, 0, 16)
+stealNote.Position = UDim2.new(0, 0, 0, 24)
+stealNote.BackgroundTransparency = 1
+stealNote.Text = "need carpet"
+stealNote.TextColor3 = Color3.fromRGB(120, 155, 210)
+stealNote.TextSize = 12
+stealNote.Font = Enum.Font.Gotham
+stealNote.Parent = stealBtn
+
+stealBtn.MouseButton1Click:Connect(function()
+	local char = player.Character
+	if char and char:FindFirstChild("HumanoidRootPart") then
+		local hrp = char.HumanoidRootPart
+		hrp.CFrame = hrp.CFrame + (hrp.CFrame.LookVector * 10)
+	end
+end)
+
+local barBG = Instance.new("Frame")
+barBG.Size = UDim2.new(1, 0, 0, 18)
+barBG.Position = UDim2.new(0, 0, 0, 150)
+barBG.BackgroundColor3 = Color3.fromRGB(16, 20, 38)
+barBG.BorderSizePixel = 0
+barBG.Parent = content
+Instance.new("UICorner", barBG).CornerRadius = UDim.new(0, 6)
+
+local barFill = Instance.new("Frame")
+barFill.Size = UDim2.new(0, 0, 1, 0)
+barFill.BackgroundColor3 = Color3.fromRGB(50, 140, 255)
+barFill.BorderSizePixel = 0
+barFill.Parent = barBG
+Instance.new("UICorner", barFill).CornerRadius = UDim.new(0, 6)
+
+local percent = Instance.new("TextLabel")
+percent.Size = UDim2.new(1, 0, 1, 0)
+percent.BackgroundTransparency = 1
+percent.Text = ""
+percent.TextColor3 = Color3.new(1,1,1)
+percent.TextSize = 12
+percent.Font = Enum.Font.GothamBold
+percent.Parent = barBG
+
+local loopConnection = nil
+local value = 0
+
+local function startLoop()
+	if loopConnection then return end
+	value = 0
+	loopConnection = RunService.RenderStepped:Connect(function(dt)
+		value = value + 160 * dt
+		if value >= 100 then value = 0 end
+		barFill.Size = UDim2.new(value/100, 0, 1, 0)
+		percent.Text = value > 0 and math.floor(value).."%" or ""
+	end)
+end
+
+local function stopLoop()
+	if loopConnection then
+		loopConnection:Disconnect()
+		loopConnection = nil
+	end
+	barFill.Size = UDim2.new(0, 0, 1, 0)
+	percent.Text = ""
+	value = 0
+end
+
+autoBtn.MouseButton1Click:Connect(function()
+	autoOn = not autoOn
+	if autoOn then
+		autoBtn.Text = "Auto Grab On"
+		autoBtn.BackgroundColor3 = Color3.fromRGB(25, 110, 55)
+		startLoop()
+	else
+		autoBtn.Text = "Auto Grab Off"
+		autoBtn.BackgroundColor3 = Color3.fromRGB(22, 30, 58)
+		stopLoop()
+	end
+end)
+
+local locked = false
+lockBtn.MouseButton1Click:Connect(function()
+	locked = not locked
+	lockBtn.Text = locked and "🔒" or "🔓"
+	lockBtn.BackgroundColor3 = locked and Color3.fromRGB(25, 110, 55) or Color3.fromRGB(30, 55, 120)
+end)
+
+local minimized = false
+local fullSize = main.Size
+
+minBtn.MouseButton1Click:Connect(function()
+	minimized = not minimized
+	if minimized then
+		content.Visible = false
+		main.Size = UDim2.new(0, 240, 0, 38)
+		minBtn.Text = "+"
+	else
+		content.Visible = true
+		main.Size = fullSize
+		minBtn.Text = "–"
+	end
+end)
+
+local dragging = false
+local dragStart, startPos
+
+titleBar.InputBegan:Connect(function(input)
+	if locked then return end
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = main.Position
+	end
+end)
+
+titleBar.InputEnded:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = false
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+	if locked or not dragging then return end
+	if input.UserInputType == Enum.UserInputType.MouseMovement then
+		local delta = input.Position - dragStart
+		main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+	end
+end)
+
+-- Show GUI after 5 seconds
+task.delay(5, function()
+	intro:Destroy()
+	main.Visible = true
+end)
